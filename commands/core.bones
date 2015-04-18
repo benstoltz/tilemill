@@ -5,6 +5,7 @@ var path = require('path');
 var Step = require('step');
 var defaults = models.Config.defaults;
 var mapnik = require('mapnik');
+var carto = require('carto');
 if (mapnik.register_default_fonts) mapnik.register_default_fonts();
 if (mapnik.register_system_fonts) mapnik.register_system_fonts();
 if (mapnik.register_default_input_plugins) mapnik.register_default_input_plugins();
@@ -96,6 +97,7 @@ command.prototype.bootstrap = function(plugin, callback) {
     settings.files = path.resolve(settings.files.replace(/^~/, process.env.HOME));
     settings.coreUrl = settings.coreUrl || '127.0.0.1:' + settings.port;
     settings.tileUrl = settings.tileUrl || '127.0.0.1:' + settings.tilePort;
+    carto.tree.Reference.setVersion(mapnik.versions.mapnik);
 
     Bones.plugin.abilities = {
         version: (function() {
@@ -112,7 +114,7 @@ command.prototype.bootstrap = function(plugin, callback) {
         tileUrl: settings.tileUrl,
         tilePort: settings.tilePort,
         tilemill: JSON.parse(fs.readFileSync(path.resolve(__dirname + '/../package.json'),'utf8')),
-        carto: require('carto').tree.Reference.data,
+        carto: carto.tree.Reference.data,
         fonts: mapnik.fonts(),
         datasources: mapnik.datasources(),
         exports: {
@@ -135,7 +137,7 @@ command.prototype.bootstrap = function(plugin, callback) {
     }
 
     // try/catch here to allow TileMill to start even if the app cannot write to
-    // its (potentiall invalid) docs location so that user can still edit the settings
+    // its (potentially invalid) docs location so that user can still edit the settings
     // to get out of problem without hand editing the config.json
     // https://github.com/mapbox/tilemill/issues/2024
     try {
